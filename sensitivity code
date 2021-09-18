@@ -1,0 +1,345 @@
+<style>
+        .container {
+            max-width: 860px;
+        }
+        
+        label {
+            color: #ccc;
+            font-size: 18px;
+            margin-bottom: 0;
+            display: inherit;
+        }
+        
+        input:read-only,
+        input:read-only:focus {
+            color: #fff !important;
+            background-color: #666 !important;
+        }
+        
+        hr {
+            border-color: #888;
+        }
+        
+        h1 {
+            font-size: 40px !important;
+        }
+        
+        h2 {
+            font-size: 20px !important;
+            font-weight: 400;
+            padding-bottom: 5px;
+        }
+        
+        @media (min-width: 540px) {
+            /* 768px */
+            hr {
+                display: none;
+            }
+            h1 {
+                font-size: 50px !important;
+            }
+        }
+    </style>
+
+<div id="content" class="pt-5 pb-3">
+
+        <div class="container">
+
+            <form>
+
+                <div class="row source">
+
+                    <div class="col-sm form-group">
+                        <label>Convert from
+					<select class="form-control form-control-lg game" data-toggle="tooltip" data-placement="top" title="Game to convert from">
+						<option>Cm per 360°</option>
+						<option>--------</option>
+						<option selected>CS:GO</option>
+					</select></label>
+                    </div>
+
+                    <div class="col-sm form-group" style="display:none">
+                        <label>FOV
+					<input type="number" class="form-control form-control-lg fov"  value="103"></label>
+                    </div>
+
+                    <div class="col-sm form-group">
+                        <label>Sensitivity
+					<input type="number" class="form-control form-control-lg sensitivity" value="1.5" data-toggle="tooltip" data-placement="top" title="In-game sensitivity to convert from"></label>
+                    </div>
+
+
+                    <div class="col-sm-4 form-group">
+                        <label>Mouse DPI
+					<input type="text" class="form-control form-control-lg dpi" value="800" data-toggle="tooltip" data-placement="top" title="Your mouse DPI (found in mouse software). Only used to calculate 360 distances."></label>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <!-- ==================== Target ==================== -->
+                <div class="row target">
+
+                    <div class="col-sm form-group">
+                        <label>Convert to
+							<select class="form-control form-control-lg game" data-toggle="tooltip" data-placement="top" title="Game to convert to">
+									<option>Cm per 360°</option>
+									<option>--------</option>
+									<option>CS:GO</option>
+									<option selected>PUBG</option>
+							</select></label>
+                    </div>
+
+                    <div class="col-sm form-group" style="display:none">
+                        <label>FOV
+						<input type="number" class="form-control form-control-lg fov" value="103"></label>
+                    </div>
+
+                    <div class="col-sm form-group">
+                        <label>Sensitivity
+						<input type="number" class="form-control form-control-lg sensitivity" value="1" data-toggle="tooltip" data-placement="top" title="Calculated in-game sensitivity" readonly></label>
+                    </div>
+
+                    <div class="col-sm-2 form-group">
+                        <label>Cm per 360°
+						<input type="text" class="form-control form-control-lg cm-per-360" value="43" data-toggle="tooltip" data-placement="top" title="Centimeters to do a 360° turn in game" readonly></label>
+                    </div>
+
+                    <div class="col-sm-2 form-group">
+                        <label>In per 360°
+						<input type="text" class="form-control form-control-lg in-per-360" value="43" data-toggle="tooltip" data-placement="top" title="Inches to do a 360° turn in game" readonly></label>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+<script>
+	        "use strict";
+
+        // Enable tooltips
+        $(function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        var games = {
+            "Apex Legends": {
+                degreesPerDot: 0.022,
+                info: "Uses the Source game engine, so shares settings with other Source games."
+            },
+            //"Battlefield 3 & 4" : { degreesPerDot: 0.52941 },
+            "Battlefield V": {
+                degreesPerDot: 0.022
+            }, // Using CS sens as reference
+            "Borderlands 2": {
+                degreesPerDot: 0.0055
+            },
+            "Call of Duty: Black Ops 4": {
+                degreesPerDot: 0.0066
+            },
+            "Counter-Strike": {
+                degreesPerDot: 0.022,
+                info: "Uses the Source game engine, so shares settings with other Source games."
+            },
+            "Destiny 2": {
+                degreesPerDot: 0.0066
+            },
+            "Duke Nukem Forever": {
+                degreesPerDot: 1.714
+            },
+            "Fortnite": {
+                degreesPerDot: 0.5715
+            },
+            "GTA 5": {
+                degreesPerDot: 0.022
+            }, // Using CS sens as reference
+            "Half-Life 1 & 2": {
+                degreesPerDot: 0.022
+            },
+            "Left 4 Dead 1 & 2": {
+                degreesPerDot: 0.022
+            },
+            "Natural Selection 2": {
+                degreesPerDot: 0.022
+            },
+            "Overwatch": {
+                degreesPerDot: 0.0066
+            },
+            "PlanetSide 2": {
+                degreesPerDot: 0.36
+            },
+            "Portal 1 & 2": {
+                degreesPerDot: 0.022
+            },
+            "PUBG (FPP)": {
+                degreesPerDot: 2.22222
+            },
+            "PUBG (TPP)": {
+                degreesPerDot: 2.22222
+            },
+            "Quake 3 Arena": {
+                degreesPerDot: 0.022
+            },
+            "Quake Live": {
+                degreesPerDot: 0.022
+            }, //0.02105
+            "Team Fortress 2": {
+                degreesPerDot: 0.022,
+                info: "Uses the Source game engine, so shares settings with other Source games."
+            },
+            "Unreal Tournament": {
+                degreesPerDot: 0.0596
+            },
+            "Warframe": {
+                degreesPerDot: 0.022
+            }, // Using CS sens as reference
+
+        }
+
+        var html = "";
+        for (var game in games) {
+            html += '<option value="' + game + '">' + game + '</option>'
+        }
+
+
+        $(".game").html(html);
+
+        $(".game").change(function() {
+            if ($(this).val() == "PUBG (FPP)" || $(this).val() == "PUBG (TPP)") {
+                $(this).parents(".row").find(".fov").parents(".form-group").show();
+            } else {
+                $(this).parents(".row").find(".fov").parents(".form-group").hide();
+
+            }
+            calculate();
+        });
+
+        $(".source .sensitivity, .source .fov, .target .fov, .source .dpi").on("input", calculate);
+
+        // Default settings
+        $(".source .sensitivity").val("1.2");
+        $(".source .game").val("GTA 5");
+        $(".source .game").prop('disabled', true);
+        $(".target .game").val("Apex Legends").change();
+
+
+        // TODO: Support for changing target sens/cm360/in360
+
+        function calculate() {
+            var sourceGame = $(".source .game").val();
+            var targetGame = $(".target .game").val();
+            var sourceDegreesPerDot = games[sourceGame].degreesPerDot;
+            var targetDegreesPerDot = games[targetGame].degreesPerDot;
+            var sourceDpi = $(".dpi").val();
+            var sourceSens = $(".source .sensitivity").val();
+
+            // Convert to linear sensitivity from actual sens
+            if (sourceGame == "PUBG (FPP)") {
+                sourceSens = 0.00203 * Math.pow(10, sourceSens / 50); // Transform from in-game to cfg sens
+                //sourceSens = Math.pow(10, sourceSens/0.0016) / 50; //  50*Math.log10(targetSens/0.0016)
+                sourceSens = sourceSens * $(".source .fov").val() / 80; // Adjust for FOV
+            }
+            if (sourceGame == "PUBG (TPP)") {
+                sourceSens = 0.0016 * Math.pow(10, sourceSens / 50); // Transform from in-game to cfg sens
+                //sourceSens = Math.pow(10, sourceSens/0.0016) / 50; //  50*Math.log10(targetSens/0.0016)
+                sourceSens = sourceSens * $(".source .fov").val() / 80; // Adjust for FOV
+            }
+
+
+            /*
+			0.75 28
+			1.5 43
+			2.1 50
+			3.35 60
+			*/
+
+            // Convert to linear sensitivity from actual sens
+            if (sourceGame == "GTA 5") {
+                sourceSens = (5 / 619) * (Math.pow(2479000 * sourceSens + 1624229689, 0.5) - 40117);
+            }
+
+            // Convert to linear sensitivity from actual sens
+            if (sourceGame == "Warframe") {
+                sourceSens = -(10 / 27) * (Math.pow(15604 - 270 * sourceSens, 0.5) - 130);
+            }
+
+            // Convert to linear sensitivity from actual sens
+            if (sourceGame == "Battlefield V") {
+                //sourceSens=-(5/32)*(Math.pow(5, 0.5) * Math.pow(6400*sourceSens + 51061373, 0.5) + 15975);
+                sourceSens = (5 / 32) * (Math.pow(5, 0.5) * Math.pow(6400 * sourceSens + 51061373, 0.5) - 15975);
+                //sourceSens=0.00128 * Math.pow(sourceSens, 2) + 6.39 * sourceSens - 3.32;
+                //sourceSens= -0.15625 * (13475 + Math.pow(15604-270*sourceSens, 0.5));
+            }
+
+            /*if (sourceGame == "GTA 5") {
+            	sourceSens = Math.pow(sourceSens, 0.192041);
+            }*/
+
+            /*if (sourceGame == "Fortnite") {
+            	sourceSens = sourceSens * 1000 / sourceDpi;
+            }*/
+
+            // Adjust for the degreesPerDot-difference between the two games.
+            var targetSens = sourceSens * (sourceDegreesPerDot / targetDegreesPerDot);
+
+
+            // Convert from linear sensitivity to actual sens
+            if (targetGame == "PUBG (FPP)") {
+                targetSens = targetSens * 80 / $(".target .fov").val(); // Adjust for FOV
+                targetSens = 50 * Math.log10(targetSens / 0.00203); // Transform from cfg sens to in-game
+            }
+            if (targetGame == "PUBG (TPP)") {
+                targetSens = targetSens * 80 / $(".target .fov").val(); // Adjust for FOV
+                targetSens = 50 * Math.log10(targetSens / 0.0016); // Transform from cfg sens to in-game
+            }
+
+            // Convert from linear sensitivity to actual sens
+            if (targetGame == "GTA 5") {
+                targetSens = 0.00619 * Math.pow(targetSens, 2) + 4.0117 * targetSens - 6;
+            }
+
+            // Convert from linear sensitivity to actual sens
+            if (targetGame == "Warframe") {
+                //targetSens=-0.0268424322*Math.pow(sourceSens, 2)+2.605023127*sourceSens-4.784036195;
+                targetSens = -0.027 * Math.pow(targetSens, 2) + 2.6 * targetSens - 4.8;
+            }
+
+            // Convert from linear sensitivity to actual sens
+            if (targetGame == "Battlefield V") {
+                //targetSens=-0.0268424322*Math.pow(sourceSens, 2)+2.605023127*sourceSens-4.784036195;
+                //targetSens=0.00127914072*Math.pow(sourceSens, 2)+6.385692249*sourceSens-3.320564198;
+                targetSens = 0.00128 * Math.pow(targetSens, 2) + 6.39 * targetSens - 3.32;
+                //targetSens=0.0013*Math.pow(sourceSens, 2)+6.39*sourceSens-3.32;
+            }
+
+
+
+            /*if (targetGame == "Fortnite") {
+            	targetSens = targetSens / (1000 / sourceDpi);
+            }*/
+
+            var in360 = 360 / (sourceDpi * sourceDegreesPerDot * sourceSens)
+            var cm360 = in360 * 2.54;
+
+            $(".target .sensitivity").val(round(targetSens, 6));
+            //$(".target .sensitivity").val(targetSens);
+
+            $(".cm-per-360").val(round(cm360, 3));
+            $(".in-per-360").val(round(in360, 3));
+
+        }
+
+        function round(num, decimals) {
+            if (num == Infinity) {
+                return "";
+            }
+            var rounding = Math.pow(10, decimals);
+            return Math.round(num * rounding) / rounding;
+        }
+        /*function round(value, decimals) {
+        	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+        }*/
+</script>
